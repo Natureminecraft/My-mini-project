@@ -31,10 +31,8 @@ def check(innum, num, maxnum):
         print("Higher")
         print()
 
-maxnum = int()
-
 while True:
-    maxnum = askmax()
+    maxnum = int(askmax())
     if maxnum:
         break
 
