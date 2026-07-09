@@ -1,34 +1,32 @@
+#Import function
 import random
 
-def askyorn():
-    ans = str(input("Roll the dice? (Y, N): "))
-    if ans == "y" or ans == "n" or ans=="Y"or ans =="N":
-        roll = ans == "y" or ans == "Y"
-        return(roll)
-    else:
-        print("Sorry please try again.")
-        print()
-        return(askyorn())
+#Functions
+def ask_yes_or_no():
+    while True:
+        yes = ("y","Y")
+        no = ("n", "N")
+        ans = str(input("Roll the dice? (Y, N): "))
+        if ans in yes or ans in no:
+            return(ans in yes)
+        else:
+            print(f"Sorry please try again.\n")
 
-def askamount():
-    ans = input("How much dice do you want to roll? (1-3): ")
-    if ans == "1" or ans == "2" or ans == "3":
-        return(int(ans))
-    else:
-        print("Sorry please try again.")
-        return(askamount())
+def ask_amount():
+    while True:
+        try:
+            ans = int(input("How much dice do you want to roll? : "))
+            return(ans)
+            break
+        except:
+            print(f"Please enter a valid number.\n")
 
-def gambling(amount):
-    fnum = random.randint(1,6)
-    snum = random.randint(1,6)
-    tnum = random.randint(1,6)
-    if amount == 1:
-        return(fnum)
-    elif amount == 2:
-        return(fnum,snum)
-    elif amount == 3:
-        return(fnum,snum,tnum)
-        
-if askyorn():
-    print()
-    print(gambling(askamount()))
+def random_number(amount):
+    num = str(random.randint(1,6))
+    for i in range(amount-1):
+        num = num + " " + str(random.randint(1,6))
+    return(num)
+
+#Code
+while ask_yes_or_no():
+    print(f"\n{random_number(ask_amount())}")

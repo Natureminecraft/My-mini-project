@@ -1,11 +1,13 @@
+#Import function
 import random
 
-dictionary = {"r":"rock","p":"paper","s":"scissor"}
+#Variables
+dictionary = {"r":"🪨","p":"📄","s":"✂️"}
 choices = ("r","p","s")
-bot = random.choice(choices)
 
+#Functions
 def ask_choices():
-    ans = input("Rock, Paper or Scissor? (r, p, s): ")
+    ans = input(f"\nRock, Paper or Scissor? (r, p, s): ")
     if ans in choices:
         return(ans)
     else:
@@ -13,34 +15,37 @@ def ask_choices():
         print()
         return(ask_choices())
 
-def check(ans,bot):
+def check(ans,bot_choice):
     print("You choose " +dictionary[ans]+".")
-    print("The bot choose " +dictionary[bot]+".")
+    print("The bot_choice choose " +dictionary[bot_choice]+".")
     print()
-    if ans == bot:
+    if ans == bot_choice:
         print("It's a tie!")
-    elif ans == "r" and bot == "p":
-        print("The bot win!")
-    elif ans == "r" and bot == "s":
-        print("You win!")
-    elif ans == "p" and bot == "r":
-        print("You win!")
-    elif ans == "p" and bot == "s":
-        print("The bot win!")
-    elif ans == "s" and bot == "r":
-        print("The bot win!")
-    elif ans == "s" and bot == "p":
+    elif ans == "r" and bot_choice == "p" or \
+    ans == "p" and bot_choice == "s" or \
+    ans == "s" and bot_choice == "r":
+       print("The bot win!")
+    elif ans == "r" and bot_choice == "s" or \
+    ans == "p" and bot_choice == "r" or \
+    ans == "s" and bot_choice == "p":
         print("You win!")
 
+def ask_playagain():
+    while True:
+        playagain = str(input("Do you want to play again? (Y, N): "))
+        if playagain == "n" or playagain == "N":
+            return(False)
+            break
+        elif playagain == "y" or playagain == "Y":
+            return(True)
+            break
+        else:
+            print("Sorry please try again.")
+
+#code
 while True:
+    bot_choice = random.choice(choices)
     ans = ask_choices()
-    check(ans,bot)
-    print()
-    playagain = str(input("Do you want to play again? (Y, N): "))
-    if playagain == "n" or playagain == "N":
+    check(ans,bot_choice)
+    if not ask_playagain():
         break
-    elif playagain == "y" or playagain == "Y":
-        print()
-    else:
-        print("Sorry please try again.")
-        print()
