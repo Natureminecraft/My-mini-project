@@ -30,3 +30,5 @@ def random_number(amount):
 #Code
 while ask_yes_or_no():
     print(f"\n{random_number(ask_amount())}")
+
+# :)
