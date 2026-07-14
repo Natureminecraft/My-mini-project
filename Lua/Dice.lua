@@ -46,6 +46,7 @@ local function gambling(amount)
     return(total)
 end
 
+-- An actuall code
 if ask_yes_or_no() then
     print(gambling(ask_how_much()))
 end
