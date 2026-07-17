@@ -1,3 +1,4 @@
+-- Functions
 local function ask_max_number()
 	while true do
 		io.write("What is the highest number you want? : ")
@@ -32,6 +33,7 @@ local function guessNum(num, maxnum)
 	end
 end
 
+--An actual code
 local maxnum = ask_max_number()
 local num = math.random(1, maxnum)
 
