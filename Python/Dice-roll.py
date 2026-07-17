@@ -12,7 +12,7 @@ def ask_yes_or_no():
         else:
             print(f"Sorry please try again.\n")
 
-def ask_amount():
+def ask_amout_of_dice():
     while True:
         try:
             ans = int(input("How much dice do you want to roll? : "))
@@ -29,4 +29,4 @@ def random_number(amount):
 
 #Code
 while ask_yes_or_no():
-    print(f"\n{random_number(ask_amount())}")
+    print(f"\n{random_number(ask_amout_of_dice())}")
