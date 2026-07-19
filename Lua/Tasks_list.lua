@@ -1,3 +1,35 @@
+local dkjson = require("dkjson")
+
+local file = "Items.json" -- Your File here
+local yes = { "y", "Y" }
+
+-- Import JSON file
+local function import(filename)
+  local im_file = io.open(filename, "r")
+  if im_file then
+    local content = im_file:read("*a")
+    im_file:close()
+    content = dkjson.decode(content)
+    return content
+  end
+  return {}
+end
+
+-- Export JSON file
+local function export(filename, table)
+  local ex_file = io.open(filename, "w")
+  if ex_file then
+    local json = dkjson.encode(table, { indent = true })
+    ex_file:write(json)
+    ex_file:close()
+  end
+end
+
+-- Check if the input is valid
+local function is_valid_input(str)
+  return str and string.match(str, "%S") ~= nil
+end
+
 -- Help working with tables easier
 local function check_table(table, find)
   for _, value in ipairs(table) do
@@ -8,15 +40,12 @@ local function check_table(table, find)
   return false
 end
 
+-- Clear all finished data
 local function clear_data(check, items)
-  for index, value in pairs(check) do
-    if value then
-      for i, _ in ipairs(items) do
-        if items[i] == index then
-          table.remove(items, i)
-        end
-      end
-      check[index] = nil
+  for i = #items, 1, -1 do
+    if check[items[i]] then
+      check[items[i]] = nil
+      table.remove(items, i)
     end
   end
   return check, items
@@ -54,7 +83,9 @@ local function read_input()
     return "esc"
   elseif c == "\r" or c == "\n" then
     return "enter"
-  elseif c == "q" then
+  end
+  c = string.lower(c)
+  if c == "q" then
     return "quit"
   elseif c == "a" then
     return "add"
@@ -75,13 +106,9 @@ local function draw_menu(items, check, selected)
   io.write("============ Tasks list ============\n\r\n\r")
   if #items ~= 0 then
     for i, item in ipairs(items) do
-      local check_box
-      if next(check) ~= nil then
-        if check[item] then
-          check_box = "󰄳"
-        else
-          check_box = "󰅙"
-        end
+      local check_box = "󰅙"
+      if check[item] then
+        check_box = "󰄳"
       end
       if i == selected then
         io.write(string.format("\27[7m" .. "%s \27[0m\n\r", check_box .. " " .. item .. "    <-"))
@@ -129,18 +156,21 @@ end
 
 local function main()
   local items = {}
-  local check = {}
+  local check = import(file)
   local selected = 1
+  for key, _ in pairs(check) do
+    table.insert(items, key)
+  end
 
   set_raw_mode(true)
   draw_menu(items, check, selected)
 
   while true do
     local key = read_input()
-    if key == "up" then
+    if key == "up" and #items > 0 then
       selected = selected - 1
       if selected < 1 then selected = #items end
-    elseif key == "down" then
+    elseif key == "down" and #items > 0 then
       selected = selected + 1
       if selected > #items then selected = 1 end
     elseif key == "enter" then
@@ -152,41 +182,61 @@ local function main()
           status = true
         end
         check[items[selected]] = status
+        export(file, check)
       end
     elseif key == "quit" then
       break
     elseif key == "add" then
       local add = ask("Add a Task: ")
-      local exist = check_table(items, add)
-      if not exist then
-        check[add] = false
-        table.insert(items, add)
+      if is_valid_input(add) then
+        local exist = check_table(items, add)
+        if not exist then
+          check[add] = false
+          table.insert(items, add)
+          export(file, check)
+        end
       end
     elseif key == "rename" then
       if #items ~= 0 then
         local rename = ask("Rename a Task: ")
-        check[rename] = check[items[selected]]
-        check[items[selected]] = nil
-        items[selected] = rename
+        if is_valid_input(rename) then
+          if rename ~= items[selected] and not check_table(items, rename) then
+            local old_status = check[items[selected]]
+            check[items[selected]] = nil
+            check[rename] = old_status
+            items[selected] = rename
+            export(file, check)
+          end
+        end
       end
     elseif key == "delete" then
       if #items ~= 0 then
-        local yes = { "y", "Y" }
         local answer = ask("Are you sure you want to remove the task? (y/n): ")
         local confirm = check_table(yes, answer)
         if confirm then
           check[items[selected]] = nil
           table.remove(items, selected)
-          if selected ~= 1 then
-            selected = selected - 1
+          if selected > #items then
+            selected = #items
           end
+          if selected < 1 then
+            selected = 1
+          end
+          export(file, check)
         end
       end
     elseif key == "clear" then
       local answer = ask("Are you sure you want to clear the task? (y/n): ")
-      if answer then
+      if check_table(yes, answer) then
         check, items = clear_data(check, items)
+        if selected > #items then
+          selected = #items
+        end
+        if selected < 1 then
+          selected = 1
+        end
       end
+      export(file, check)
     end
     draw_menu(items, check, selected)
   end
